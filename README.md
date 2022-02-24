@@ -15,9 +15,17 @@ Role Variables
 
 Available variables are listed below, along with default values (see defaults/main.yml):
 
-* Description
+* Logstash version
   ```yml
-  var: "7.14.0"
+  logstash_version: "7.14.0"
+  ```
+* The URL (including port) over which Logstash will send data to Elasticsearch.
+  ```yml
+  logstash_elasticsearch_url: "http://localhost:9200"
+  ```
+* JVM memory limits. Usefull to avoid oom killer.
+  ```yml
+  logstash_java_opts: "-Xms256m -Xmx256m"
   ```
 
 Dependencies
@@ -39,9 +47,9 @@ Below is more complete example with variables.
 - name: Install Logstash
   hosts: el
   vars:
-    - filebeat_elasticsearch_url: ["http://{{ hostvars['el-instance']['ansible_facts']['default_ipv4']['address'] }}:9200/"]
-    - filebeat_kibana_url:  "http://{{ hostvars['k-instance']['ansible_facts']['default_ipv4']['address'] }}:5601"
-    - kibana_version: "7.14.0"
+    - logstash_version: "7.14.0"
+    - logstash_elasticsearch_url: ["http://{{ hostvars['el-instance']['ansible_facts']['default_ipv4']['address'] }}:9200/"]
+    - logstash_java_opts: "-Xms256m -Xmx256m"
   roles:
     - logstash-role
   tags: logstash
