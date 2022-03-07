@@ -2,7 +2,8 @@
 - name: Verify
   hosts: all
   vars:
-    filebeat_setup_kibana: false
+    filebeat_output_destination: "elastic"
+    filebeat_setup_kibana: true
     filebeat_version: "7.14.0"
   gather_facts: true
   tasks:
@@ -14,12 +15,6 @@
     - name: get kibana
       include_role:
         name: "kibana-role"
-    - name: get kibana
-      include_role:
-        name: "kibana-role"
-    - name: apply filebeat-role to setup kibana dashboards
-      include_role:
-        name: "filebeat-role"
 
     ### Проверка, что веб функционирует корректно. 
     ### Могут быть редиректы, считаем что это ок.
@@ -46,6 +41,11 @@
       retries: 10
       delay: 60
 
+    # Первый запуск, чтобы настроить дешборды Кибаны
+    - name: apply filebeat-role to setup kibana dashboards
+      include_role:
+        name: "filebeat-role"
+
     ### Проверит, что процесс Файлбит запущен и выведет ID
     - name: check filebeat is running
       shell:
@@ -70,3 +70,9 @@
     - name: checkif index not empty
       debug: msg="number of documents in filebeat index = {{ elastic_filebeat_index.json[0]['docs.count'] }}"
       failed_when: elastic_filebeat_index.json[0]['docs.count'] == "0"
+
+    - name: apply filebeat-role to setup kibana dashboards
+      vars:
+        filebeat_output_destination: "logstash"
+      include_role:
+        name: "filebeat-role"

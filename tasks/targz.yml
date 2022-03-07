@@ -48,20 +48,19 @@
         extra_opts: [--strip-components=1]
         creates: "{{ logstash_home }}/bin/logstash"
 
-# ##
-#     - name: Configure startup options
-#       become: true
-#       template:
-#         src: "startup.options.j2"
-#         dest: "/etc/logstash/startup.options"
-#         mode: 0644
-#       notify: restart Logstash
+    - name: Create java options directory
+      file:
+        state: directory
+        mode: 0755
+        path: "{{ item }}"
+      loop:
+        - "{{ logstash_home}}/config/jvm.options.d"
 
     - name: Configure JVM options
       become: true
       template:
         src: "jvm.options.j2"
-        dest: "{{ logstash_home}}/config/jvm.options"
+        dest: "{{ logstash_home}}/config/jvm.options.d/jvm.options"
         mode: 0644
 
     - name: Create Logstash configuration files.
@@ -74,7 +73,6 @@
         - simple_config.conf
         - pipelines.yml
         - startup.options
-##
 
     - name: Set environment Logstash
       become: true
@@ -96,4 +94,3 @@
           cmd: podman exec -d -it {{ ansible_nodename }} bash /etc/profile.d/logstash.sh
         changed_when: false
         delegate_to: 127.0.0.1
-
