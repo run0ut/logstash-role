@@ -2,9 +2,11 @@
 - name: Verify
   hosts: all
   vars:
+    elk_version: "7.14.0"
+    logstash_home: /opt/logstash/{{ elk_version }}
     filebeat_output_destination: "elastic"
     filebeat_setup_kibana: true
-    filebeat_version: "7.14.0"
+    filebeat_version: "{{ elk_version }}"
   gather_facts: true
   tasks:
 
@@ -76,3 +78,23 @@
         filebeat_output_destination: "logstash"
       include_role:
         name: "filebeat-role"
+
+    ### Проверим, что Logstash отвечает адекватно.
+    - name: netology85, optional, task №3
+      block: 
+      - name: make shure there are no any running logstashes
+        shell:
+          cmd: docker exec {{ ansible_nodename }} bash -c 'kill -9 $(pgrep /opt/logstash/7.14.0/jdk/bin/java -f)'
+        changed_when: false
+        failed_when: false
+        delegate_to: 127.0.0.1
+      - name: check logstash will answer normally
+        shell:
+          cmd: docker exec {{ ansible_nodename }} {{ logstash_home }}/bin/logstash -e 'input { stdin { } } output { stdout {} }'
+        register: netology85_opt_3
+        changed_when: false
+        delegate_to: 127.0.0.1
+      - name: print logstash answer if previous command exited well (retcode = 0)
+        debug: msg="{{ netology85_opt_3.stdout_lines }}"
+        # debug: msg="{{ netology85_opt_3 }}"
+        when: netology85_opt_3.rc == 0
