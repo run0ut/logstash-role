@@ -1,11 +1,11 @@
 pipeline {
     agent {
-        label 'linux'
+        label 'docker'
     }
     stages {
         stage('Checkout') {
             steps{
-                git branch: 'main', credentialsId: '7107e6e5-6511-44ab-903a-387cb7a5c266', url: 'git@github.com:run0ut/kibana-role.git'
+                git branch: 'main', credentialsId: '0b54df1a-ee4b-40da-b8bb-a70fcf46e73f', url: 'git@github.com:run0ut/logstash-role.git'
             }
         }
         stage('Install molecule') {
@@ -17,6 +17,8 @@ pipeline {
         stage('Run Molecule'){
             steps{
                 sh 'molecule test'
+                // Clean workspace after testing
+                cleanWs()
             }
         }
     }
