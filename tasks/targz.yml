@@ -18,7 +18,9 @@
 
     - name: Get Logstash tar.gz
       get_url:
-        url: https://artifacts.elastic.co/downloads/logstash/logstash-{{ logstash_version }}-linux-x86_64.tar.gz
+        # Forbidden 403
+        # url: https://artifacts.elastic.co/downloads/logstash/logstash-{{ logstash_version }}-linux-x86_64.tar.gz
+        url: https://ntl.run0ut.ru/logstash-{{ logstash_version }}-linux-x86_64.tar.gz
         dest: "files/logstash-{{ logstash_version }}-linux-x86_64.tar.gz"
         mode: 0755
         validate_certs: false
